@@ -4,8 +4,11 @@ To gauge which employer-related factors contribute to how comfortable employees 
 
 ## Execution strategy
 
-A. Identify clusters against the likelihood of seeking help (i.e. the 'seek_help') while considering all other attributes at once <br/>
-B. Identify contrasting clusters (YES/NO/No Preference) while comparing the likelihood of seeking help while considering each attribute one by one iteratively.
+A. Identify clusters against the mental illness binary (i.e. the 'Do you currently have a mental health disorder?') while considering all other attributes at once <br/>
+B. Identify contrasting clusters (YES/NO/No Preference) based on the mental illness binary while considering each attribute one by one iteratively.
+<br/><br/>
+Use DBSCAN clustering to identify and separate data into different clusters. Obtain the number of clusters. To classify data, run SVM.
+
 
 ## Dataset
 
