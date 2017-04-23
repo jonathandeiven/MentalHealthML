@@ -1,6 +1,6 @@
 ## Goal
 
-To gauge which employer-related factors contribute to how comfortable employees in the tech industry are with seeking help related to mental health issues.
+To gauge which employer-related factors contribute to employees in the tech industry are with seeking help related to mental health issues.
 
 ## Execution strategy
 
