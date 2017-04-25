@@ -11,6 +11,7 @@ from sklearn.cluster import DBSCAN
 from sklearn import metrics
 from sklearn.datasets.samples_generator import make_blobs
 from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 
 import matplotlib.pyplot as plt
 
@@ -79,56 +80,21 @@ df = df.drop(drop_elements, axis = 1)
 ###
 
 #X is features, y is dependent variable
-X = df.drop(['treatment'],axis=1)
+X = df.drop(['treatment','comments'],axis=1)
+pca = PCA(n_components=1)
+
+pca.fit(X)
+X_transformed = pca.fit_transform(X)
+print(X_transformed)
+
 y = df['treatment']
 labels_true = y
 y = le.fit_transform(y)
 
 
-##PCA things
-centers = [[1, 1], [-1, -1], [1, -1]]
-x_pca = [df.coworkers]
-print("x_pca", x_pca)
-y_pca = [df.seek_help]
-print("y_pca", y_pca)
-
-fig = plt.figure(1, figsize=(4, 3))
-plt.clf()
-
-plt.cla()
-pca = decomposition.PCA(n_components=3)
-pca.fit(x_pca)
-x_pca = pca.transform(x_pca)
-
-#RNN things
-
-#set of r values for cross-val
-#through iteration, 1.75 was found to be the lowest r value that returns clusters, and >4 returns only 1 cluster
-radii = np.linspace(1.75,4, num=10)
-
-neighbors = np.linspace(1,100, num=20)
-
-cv_scores_knn = []
-
-for r in neighbors: #10-fold cross validation
-  rnn = RadiusNeighborsClassifier(radius=r)
-  scores = cross_val_score(rnn, X, y, cv=10, scoring='accuracy')
-  cv_scores_knn.append(scores.mean())
-
-print("CV SCORES",cv_scores_knn)
-
-maxradii = max(cv_scores_knn)
-print("maxradii:::", maxradii)
-
-max_ind = np.where(cv_scores_knn==maxradii)[0]
-
-eps = math.floor(radii[max_ind])
-print("EPS:::", eps)
-
-
 #DBSCAN STUFF#
 #NEED TO CHOOSE EPS AND MIN_SAMPLES#
-db = DBSCAN(eps=3, min_samples=5).fit(X)
+db = DBSCAN(eps=3, min_samples=5).fit(X_transformed)
 core_samples = db.core_sample_indices_
 print(len(X))
 core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
@@ -167,5 +133,5 @@ for k, col in zip(unique_labels, colors):
              markeredgecolor='k', markersize=6)
 
 plt.title('Estimated number of clusters: %d' % n_clusters_)
-plt.axis([-10,80,-10,20])
+plt.axis([-10,80,-5,5])
 plt.show()
