@@ -8,7 +8,7 @@ from sklearn.preprocessing import LabelEncoder
 le = LabelEncoder()
 
 from sklearn.cluster import DBSCAN
-from sklearn.neighbours import KNeighborsClassifier
+from sklearn.neighbors import RadiusNeighborsClassifier
 from sklearn import metrics
 from sklearn.datasets.samples_generator import make_blobs
 from sklearn.preprocessing import StandardScaler
