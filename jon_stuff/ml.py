@@ -85,32 +85,32 @@ y = df['treatment']
 labels_true = y
 y = le.fit_transform(y)
 
-#KNN things
+#RNN things
 
-#KNN things
+#set of r values for cross-val
+#through iteration, 1.75 was found to be the lowest r value that returns clusters, and >4 returns only 1 cluster
+radii = np.linspace(1.75,4, num=10)
 
-#set of k values for cross-val 20 values between 1-100
-neighbours = np.linspace(1,100, num=20)
+cv_scores_knn = []
 
-cv_scores = []
+for r in neighbours: #10-fold cross validation
+  rnn = KNeighborsClassifier(radius=r)
+  scores = cross_val_score(rnn, X, y, cv=10, scoring='accuracy')
+  cv_scores_knn.append(scores.mean())
 
-for k in neighbours: #10-fold cross validation
-  knn = KNeighborsClassifier(n_neighbors=k)
-  scores = cross_val_score(knn, X, y, cv=10, scoring='accuracy')
-  cv_scores.append(scores.mean())
+print(cv_scores)
 
-#get highest cross value score
-maxcv = max(cv_scores)
-#find k value that corresponds to the highest k value
-max_ind = np.where(cv_scores==maxcv)[0]
+maxradii = max(cv_scores)
+print(maxcv)
 
-#min samples = best k value
-minPts = math.floor(neighbours[max_ind])
+max_ind = np.where(cv_scores==maxradii)[0]
+
+eps = math.floor(radii[max_ind])
 
 
 #DBSCAN STUFF#
 #NEED TO CHOOSE EPS AND MIN_SAMPLES#
-db = DBSCAN(eps=2, min_samples=minPts).fit(X)
+db = DBSCAN(eps=eps, min_samples=5).fit(X)
 core_samples = db.core_sample_indices_
 print(len(X))
 core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
