@@ -2,16 +2,15 @@ import numpy as np
 import pandas as pd
 
 from subprocess import check_output
+print(check_output(["ls", "survey.csv"]).decode("utf8"))
 
 from sklearn.preprocessing import LabelEncoder
 le = LabelEncoder()
 
 from sklearn.cluster import DBSCAN
-from sklearn.neighbors import RadiusNeighborsClassifier
 from sklearn import metrics
 from sklearn.datasets.samples_generator import make_blobs
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import cross_val_score
 
 import matplotlib.pyplot as plt
 
@@ -23,7 +22,7 @@ df.head()
 ###
 #CLEAN THE DATA
 
-df.family_history = le.fit_transform(df.family_history)
+df.family_history = le.fit_transform(df.family_history) 
 df.mental_health_consequence = le.fit_transform(df.mental_health_consequence)
 df.phys_health_consequence = le.fit_transform(df.phys_health_consequence)
 df.coworkers = le.fit_transform(df.coworkers)
