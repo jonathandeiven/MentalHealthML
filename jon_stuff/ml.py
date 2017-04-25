@@ -13,7 +13,10 @@ from sklearn.datasets.samples_generator import make_blobs
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_val_score
 
+from sklearn import svm
+
 import matplotlib.pyplot as plt
+
 
 df = pd.read_csv("survey.csv")
 list(df)
@@ -129,3 +132,11 @@ for k, col in zip(unique_labels, colors):
 plt.title('Estimated number of clusters: %d' % n_clusters_)
 plt.axis([-10,80,-10,20])
 plt.show()
+
+
+#SVM
+clf = svm.SVC(decision_function_shape = 'ovo')
+clf.fit(X, y)
+scores_ = cross_val_score(clf, X, y, cv=10, scoring='accuracy') #10-fold cross validation
+print(clf.score(X, y))# this is validation across the entire dataset, no testing data
+print(scores_.mean()) 
