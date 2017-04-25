@@ -99,12 +99,6 @@ print("x_pca", x_pca)
 y_pca = [df.seek_help]
 print("y_pca", y_pca)
 
-iris = datasets.load_iris()
-X = iris.data
-#print("X", X)
-y = iris.target
-#print("Y", y)
-
 fig = plt.figure(1, figsize=(4, 3))
 plt.clf()
 
@@ -118,7 +112,6 @@ x_pca = pca.transform(x_pca)
 #set of r values for cross-val
 #through iteration, 1.75 was found to be the lowest r value that returns clusters, and >4 returns only 1 cluster
 radii = np.linspace(1.75,4, num=10)
-
 
 neighbors = np.linspace(1,100, num=20)
 
