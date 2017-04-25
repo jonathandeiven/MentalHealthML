@@ -50,6 +50,7 @@ df.self_employed = le.fit_transform(df.self_employed)
 df.loc[df['comments'].isnull(),['comments']]=0 # replace all no comments with zero
 df.loc[df['comments']!=0,['comments']]=1 # replace all comments with a flag 1
 
+
 df['leave'].replace(['Very easy', 'Somewhat easy', "Don\'t know", 'Somewhat difficult', 'Very difficult'],
                      [1, 2, 3, 4, 5],inplace=True)
 df['work_interfere'].replace(['Never','Rarely','Sometimes','Often'],[1,2,3,4],inplace=True)
@@ -91,6 +92,7 @@ y = le.fit_transform(y)
 #set of r values for cross-val
 #through iteration, 1.75 was found to be the lowest r value that returns clusters, and >4 returns only 1 cluster
 radii = np.linspace(1.75,4, num=10)
+
 
 neighbors = np.linspace(1,100, num=20)
 
