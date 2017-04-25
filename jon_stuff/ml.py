@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import math
 
 from subprocess import check_output
 print(check_output(["ls", "survey.csv"]).decode("utf8"))
@@ -13,6 +14,9 @@ from sklearn import metrics
 from sklearn.datasets.samples_generator import make_blobs
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_val_score
+
+from sklearn import decomposition
+from sklearn import datasets
 
 import matplotlib.pyplot as plt
 
@@ -87,6 +91,28 @@ y = df['treatment']
 labels_true = y
 y = le.fit_transform(y)
 
+
+##PCA things
+centers = [[1, 1], [-1, -1], [1, -1]]
+x_pca = [df.coworkers]
+print("x_pca", x_pca)
+y_pca = [df.seek_help]
+print("y_pca", y_pca)
+
+iris = datasets.load_iris()
+X = iris.data
+#print("X", X)
+y = iris.target
+#print("Y", y)
+
+fig = plt.figure(1, figsize=(4, 3))
+plt.clf()
+
+plt.cla()
+pca = decomposition.PCA(n_components=3)
+pca.fit(x_pca)
+x_pca = pca.transform(x_pca)
+
 #RNN things
 
 #set of r values for cross-val
@@ -103,14 +129,16 @@ for r in neighbors: #10-fold cross validation
   scores = cross_val_score(rnn, X, y, cv=10, scoring='accuracy')
   cv_scores_knn.append(scores.mean())
 
-print(cv_scores)
+print("CV SCORES",cv_scores_knn)
 
-maxradii = max(cv_scores)
-print(maxcv)
+maxradii = max(cv_scores_knn)
+print("maxradii:::", maxradii)
 
-max_ind = np.where(cv_scores==maxradii)[0]
+max_ind = np.where(cv_scores_knn==maxradii)[0]
 
 eps = math.floor(radii[max_ind])
+print("EPS:::", eps)
+
 
 
 #DBSCAN STUFF#
@@ -123,15 +151,18 @@ core_samples_mask[db.core_sample_indices_] = True
 labels = db.labels_
 
 n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
+print("n_clusters_::", n_clusters_)
+
+print("LABBELS TRUE::", labels_true)
 
 print('Estimated number of clusters: %d' % n_clusters_)
-print("Homogeneity: %0.3f" % metrics.homogeneity_score(labels_true, labels))
-print("Completeness: %0.3f" % metrics.completeness_score(labels_true, labels))
-print("V-measure: %0.3f" % metrics.v_measure_score(labels_true, labels))
-print("Adjusted Rand Index: %0.3f"
-      % metrics.adjusted_rand_score(labels_true, labels))
-print("Adjusted Mutual Information: %0.3f"
-      % metrics.adjusted_mutual_info_score(labels_true, labels))
+#print("Homogeneity: %0.3f" % metrics.homogeneity_score(labels_true, labels))
+#print("Completeness: %0.3f" % metrics.completeness_score(labels_true, labels))
+#print("V-measure: %0.3f" % metrics.v_measure_score(labels_true, labels))
+#print("Adjusted Rand Index: %0.3f"
+#      % metrics.adjusted_rand_score(labels_true, labels))
+#print("Adjusted Mutual Information: %0.3f"
+#      % metrics.adjusted_mutual_info_score(labels_true, labels))
 print("Silhouette Coefficient: %0.3f"
       % metrics.silhouette_score(X, labels))
 
@@ -146,6 +177,8 @@ for k, col in zip(unique_labels, colors):
     class_member_mask = (labels == k)
 
     xy = X[class_member_mask & core_samples_mask]
+    print("XY::", xy)
+    print(type(xy))
     plt.plot(xy.iloc[:, 0], xy.iloc[:, 1], 'o', markerfacecolor=col,
              markeredgecolor='k', markersize=14)
 
@@ -153,6 +186,6 @@ for k, col in zip(unique_labels, colors):
     plt.plot(xy.iloc[:, 0], xy.iloc[:, 1], 'o', markerfacecolor=col,
              markeredgecolor='k', markersize=6)
 
-plt.title('Estimated number of clusters: %d' % n_clusters_)
-plt.axis([-10,80,-10,20])
+#plt.title('Estimated number of clusters: %d' % n_clusters_)
+#plt.axis([-10,80,-10,20])
 plt.show()
