@@ -2,15 +2,16 @@ import numpy as np
 import pandas as pd
 
 from subprocess import check_output
+#print(check_output(["ls", "survey.csv"]).decode("utf8"))
 
 from sklearn.preprocessing import LabelEncoder
 le = LabelEncoder()
 
 from sklearn.cluster import DBSCAN
-from sklearn.neighbors import RadiusNeighborsClassifier
 from sklearn import metrics
 from sklearn.datasets.samples_generator import make_blobs
 from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 from sklearn.model_selection import cross_val_score
 
 from sklearn import svm
@@ -52,8 +53,8 @@ df.self_employed = le.fit_transform(df.self_employed)
 df.loc[df['comments'].isnull(),['comments']]=0 # replace all no comments with zero
 df.loc[df['comments']!=0,['comments']]=1 # replace all comments with a flag 1
 
-df['leave'].replace(['Very easy', 'Somewhat easy', "Don\'t know", 'Somewhat difficult', 'Very difficult'], 
-                     [1, 2, 3, 4, 5],inplace=True) 
+df['leave'].replace(['Very easy', 'Somewhat easy', "Don\'t know", 'Somewhat difficult', 'Very difficult'],
+                     [1, 2, 3, 4, 5],inplace=True)
 df['work_interfere'].replace(['Never','Rarely','Sometimes','Often'],[1,2,3,4],inplace=True)
 
 
@@ -83,7 +84,13 @@ df = df.drop(drop_elements, axis = 1)
 ###
 
 #X is features, y is dependent variable
-X = df.drop(['treatment'],axis=1)
+X = df.drop(['treatment','comments'],axis=1)
+pca = PCA(n_components=1)
+
+pca.fit(X)
+X_transformed = pca.fit_transform(X)
+print(X_transformed)
+
 y = df['treatment']
 labels_true = y
 y = le.fit_transform(y)
@@ -91,7 +98,7 @@ y = le.fit_transform(y)
 
 #DBSCAN STUFF#
 #NEED TO CHOOSE EPS AND MIN_SAMPLES#
-db = DBSCAN(eps=3, min_samples=5).fit(X)
+db = DBSCAN(eps=3, min_samples=5).fit(X_transformed)
 core_samples = db.core_sample_indices_
 print(len(X))
 core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
@@ -130,13 +137,14 @@ for k, col in zip(unique_labels, colors):
              markeredgecolor='k', markersize=6)
 
 plt.title('Estimated number of clusters: %d' % n_clusters_)
-plt.axis([-10,80,-10,20])
-plt.show()
-
 
 #SVM
 clf = svm.SVC(decision_function_shape = 'ovo')
 clf.fit(X, y)
-scores_ = cross_val_score(clf, X, y, cv=10, scoring='accuracy') #10-fold cross validation
-print(clf.score(X, y))# this is validation across the entire dataset, no testing data
-print(scores_.mean()) 
+scores_ = cross_val_score(clf, X, y, cv=10, scoring='accuracy')
+training_score = clf.score(X,y)
+testing_score = scores_.mean()
+
+print("traingin accuracy: " + str(training_score))
+print("testing accuracy: " + str(testing_score))
+
