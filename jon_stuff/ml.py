@@ -81,12 +81,15 @@ df = df.drop(drop_elements, axis = 1)
 #X is features, y is dependent variable
 X = df.drop(['treatment'],axis=1)
 y = df['treatment']
+labels_true = y
 y = le.fit_transform(y)
 
 
 #DBSCAN STUFF#
 #NEED TO CHOOSE EPS AND MIN_SAMPLES#
-db = DBSCAN(eps=20, min_samples=10).fit(X)
+db = DBSCAN(eps=2, min_samples=5).fit(X)
+core_samples = db.core_sample_indices_
+print(len(X))
 core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
 core_samples_mask[db.core_sample_indices_] = True
 labels = db.labels_
@@ -94,16 +97,17 @@ labels = db.labels_
 n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
 
 print('Estimated number of clusters: %d' % n_clusters_)
-#print("Homogeneity: %0.3f" % metrics.homogeneity_score(labels_true, labels))
-#print("Completeness: %0.3f" % metrics.completeness_score(labels_true, labels))
-#print("V-measure: %0.3f" % metrics.v_measure_score(labels_true, labels))
-#print("Adjusted Rand Index: %0.3f"
-      #% metrics.adjusted_rand_score(labels_true, labels))
-#print("Adjusted Mutual Information: %0.3f"
-      #% metrics.adjusted_mutual_info_score(labels_true, labels))
+print("Homogeneity: %0.3f" % metrics.homogeneity_score(labels_true, labels))
+print("Completeness: %0.3f" % metrics.completeness_score(labels_true, labels))
+print("V-measure: %0.3f" % metrics.v_measure_score(labels_true, labels))
+print("Adjusted Rand Index: %0.3f"
+      % metrics.adjusted_rand_score(labels_true, labels))
+print("Adjusted Mutual Information: %0.3f"
+      % metrics.adjusted_mutual_info_score(labels_true, labels))
 print("Silhouette Coefficient: %0.3f"
       % metrics.silhouette_score(X, labels))
 
+# Black removed and is used for noise instead.
 unique_labels = set(labels)
 colors = plt.cm.Spectral(np.linspace(0, 1, len(unique_labels)))
 for k, col in zip(unique_labels, colors):
@@ -114,13 +118,13 @@ for k, col in zip(unique_labels, colors):
     class_member_mask = (labels == k)
 
     xy = X[class_member_mask & core_samples_mask]
-    plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=col,
+    plt.plot(xy.iloc[:, 0], xy.iloc[:, 1], 'o', markerfacecolor=col,
              markeredgecolor='k', markersize=14)
 
     xy = X[class_member_mask & ~core_samples_mask]
-    plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=col,
+    plt.plot(xy.iloc[:, 0], xy.iloc[:, 1], 'o', markerfacecolor=col,
              markeredgecolor='k', markersize=6)
 
 plt.title('Estimated number of clusters: %d' % n_clusters_)
+plt.axis([-10,80,-10,20])
 plt.show()
-
