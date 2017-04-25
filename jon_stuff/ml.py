@@ -8,6 +8,7 @@ from sklearn.preprocessing import LabelEncoder
 le = LabelEncoder()
 
 from sklearn.cluster import DBSCAN
+from sklearn.neighbours import KNeighborsClassifier
 from sklearn import metrics
 from sklearn.datasets.samples_generator import make_blobs
 from sklearn.preprocessing import StandardScaler
@@ -84,10 +85,32 @@ y = df['treatment']
 labels_true = y
 y = le.fit_transform(y)
 
+#KNN things
+
+#KNN things
+
+#set of k values for cross-val 20 values between 1-100
+neighbours = np.linspace(1,100, num=20)
+
+cv_scores = []
+
+for k in neighbours: #10-fold cross validation
+  knn = KNeighborsClassifier(n_neighbors=k)
+  scores = cross_val_score(knn, X, y, cv=10, scoring='accuracy')
+  cv_scores.append(scores.mean())
+
+#get highest cross value score
+maxcv = max(cv_scores)
+#find k value that corresponds to the highest k value
+max_ind = np.where(cv_scores==maxcv)[0]
+
+#min samples = best k value
+minPts = math.floor(neighbours[max_ind])
+
 
 #DBSCAN STUFF#
 #NEED TO CHOOSE EPS AND MIN_SAMPLES#
-db = DBSCAN(eps=2, min_samples=5).fit(X)
+db = DBSCAN(eps=2, min_samples=minPts).fit(X)
 core_samples = db.core_sample_indices_
 print(len(X))
 core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
