@@ -7,6 +7,11 @@ print(check_output(["ls", "survey.csv"]).decode("utf8"))
 from sklearn.preprocessing import LabelEncoder
 le = LabelEncoder()
 
+from sklearn.cluster import DBSCAN
+from sklearn import metrics
+from sklearn.datasets.samples_generator import make_blobs
+from sklearn.preprocessing import StandardScaler
+
 import matplotlib.pyplot as plt
 
 df = pd.read_csv("survey.csv")
@@ -81,7 +86,7 @@ y = le.fit_transform(y)
 
 #DBSCAN STUFF#
 #NEED TO CHOOSE EPS AND MIN_SAMPLES#
-db = DBSCAN(eps=20, min_samples=10).fit(y)
+db = DBSCAN(eps=20, min_samples=10).fit(X)
 core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
 core_samples_mask[db.core_sample_indices_] = True
 labels = db.labels_
@@ -89,15 +94,15 @@ labels = db.labels_
 n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
 
 print('Estimated number of clusters: %d' % n_clusters_)
-print("Homogeneity: %0.3f" % metrics.homogeneity_score(labels_true, labels))
-print("Completeness: %0.3f" % metrics.completeness_score(labels_true, labels))
-print("V-measure: %0.3f" % metrics.v_measure_score(labels_true, labels))
-print("Adjusted Rand Index: %0.3f"
-      % metrics.adjusted_rand_score(labels_true, labels))
-print("Adjusted Mutual Information: %0.3f"
-      % metrics.adjusted_mutual_info_score(labels_true, labels))
+#print("Homogeneity: %0.3f" % metrics.homogeneity_score(labels_true, labels))
+#print("Completeness: %0.3f" % metrics.completeness_score(labels_true, labels))
+#print("V-measure: %0.3f" % metrics.v_measure_score(labels_true, labels))
+#print("Adjusted Rand Index: %0.3f"
+      #% metrics.adjusted_rand_score(labels_true, labels))
+#print("Adjusted Mutual Information: %0.3f"
+      #% metrics.adjusted_mutual_info_score(labels_true, labels))
 print("Silhouette Coefficient: %0.3f"
-      % metrics.silhouette_score(y, labels))
+      % metrics.silhouette_score(X, labels))
 
 unique_labels = set(labels)
 colors = plt.cm.Spectral(np.linspace(0, 1, len(unique_labels)))
