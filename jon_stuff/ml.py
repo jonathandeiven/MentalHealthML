@@ -13,6 +13,7 @@ from sklearn.datasets.samples_generator import make_blobs
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.model_selection import cross_val_score
+from sklearn import naive_bayes
 
 from sklearn import svm
 
@@ -85,7 +86,7 @@ df = df.drop(drop_elements, axis = 1)
 
 #X is features, y is dependent variable
 X = df.drop(['treatment','comments'],axis=1)
-pca = PCA(n_components=1)
+pca = PCA(n_components=16)
 
 pca.fit(X)
 X_transformed = pca.fit_transform(X)
@@ -140,11 +141,20 @@ plt.title('Estimated number of clusters: %d' % n_clusters_)
 
 #SVM
 clf = svm.SVC(decision_function_shape = 'ovo')
-clf.fit(X, y)
-scores_ = cross_val_score(clf, X, y, cv=10, scoring='accuracy')
-training_score = clf.score(X,y)
-testing_score = scores_.mean()
+clf.fit(X_transformed, y)
+scores_ = cross_val_score(clf, X_transformed, y, cv=10, scoring='accuracy')
+training_score_SVM = clf.score(X_transformed,y)
+testing_score_SVM = scores_.mean()
 
-print("traingin accuracy: " + str(training_score))
-print("testing accuracy: " + str(testing_score))
+print("SVM training accuracy: " + str(training_score_SVM))
+print("SVM testing accuracy: " + str(testing_score_SVM))
 
+#Naive Bayes
+gnb = naive_bayes.GaussianNB()
+gnb.fit(X_transformed,y)
+gnb_scores = cross_val_score(gnb, X_transformed, y, cv=10, scoring='accuracy')
+training_score_bayes = gnb.score(X_transformed,y)
+testing_score_bayes = gnb_scores.mean()
+
+print("Naive Bayes training accuracy" + str(training_score_bayes))
+print("Naive Bayes testing accuracy" + str(testing_score_bayes))
